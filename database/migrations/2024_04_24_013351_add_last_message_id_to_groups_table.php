@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::table('groups', function (Blueprint $table) {
             //
-            $table->foreignId('last_message_id')->constrained('messages')->nullable();
+            $table->foreignId('last_message_id')->nullable()->constrained('messages');
         });
     }
 
