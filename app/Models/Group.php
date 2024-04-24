@@ -30,4 +30,9 @@ class Group extends Model
     {
         return $this->hasMany(Message::class);
     }
+
+    public function owner()
+    {
+        return $this->belongsTo(User::class,'owner_id','id');
+    }
 }
