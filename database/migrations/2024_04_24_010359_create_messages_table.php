@@ -13,6 +13,11 @@ return new class extends Migration
     {
         Schema::create('messages', function (Blueprint $table) {
             $table->id();
+            $table->longText('message')->nullable();
+            $table->foreignId('sender_id')->constrained('users');
+            $table->foreignId('receiver_id')->constrained('users')->nullable();
+            $table->foreignId('group_id')->constrained('groups')->nullable();
+            $table->foreignId('conversation_id')->constrained('conversations')->nullable();
             $table->timestamps();
         });
     }
