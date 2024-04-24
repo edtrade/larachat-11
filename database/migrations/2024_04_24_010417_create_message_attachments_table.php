@@ -13,6 +13,11 @@ return new class extends Migration
     {
         Schema::create('message_attachments', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('message_id')->constrained('messages')->nullable();
+            $table->string('name');
+            $table->string('path');
+            $table->string('mime');
+            $table->integer('size');
             $table->timestamps();
         });
     }
