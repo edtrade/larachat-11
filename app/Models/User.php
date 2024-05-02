@@ -52,4 +52,51 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(Group::class);
     }
+
+    //
+    public static function getUsersExceptUser(User $exceptUser)
+    {
+        $except_user_id = $exceptUser->id;
+        $query = self::select([
+            'users.*',
+            'messages.message as last_message',
+            'messages.created_at as last_message_date'
+        ])
+        ->where('users.id','!=',$except_user_id)
+        ->when(! $exceptUser->is_admin,function($query){
+            $query->whereNull('users.blocked_at');
+        })
+        ->leftJoin('conversations',function($join) use ($except_user_id){
+            $join->on('conversations.user1_id','=','users.id')
+                ->where('conversations.user2_id','=',$except_user_id)
+                ->orWhere(function($query) use ($except_user_id){
+                    $query->on('conversations.user2_id','=','users.id')
+                    ->where('conversations.user1_id','=',$except_user_id);
+                });
+        })
+        ->leftJoin('messages','messages.id','=','conversations.last_message_id')
+        ->orderByRaw('IFNULL(users.blocked_at,1)')
+        ->orderBy('messages.created_at','desc')
+        ->orderBy('users.name');
+
+        //dd($query->toSql());
+
+        return $query->get();
+    }
+
+    //
+    public function getConversationArray()
+    {
+        return [
+            'id'                => $this->id,
+            'name'              => $this->name,
+            'is_group'          => false,
+            'is_user'           => true,
+            'is_admin'          => (bool) $this->is_admin,
+            'created_at'        => $this->created_at,
+            'blocked_at'        => $this->blocked_at,
+            'last_message'      => $this->last_message,
+            'last_message_date' => $this->last_message_date
+        ];
+    }
 }

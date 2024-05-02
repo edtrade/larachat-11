@@ -22,6 +22,15 @@ use App\Http\Controllers\ProfileController;
 
 Route::middleware(['auth', 'verified'])->group(function(){
     Route::get('/',[HomeController::class, 'index'])->name('dashboard');
+
+    Route::get('/user',function(){
+
+    })->name('chat.user');   
+
+    Route::get('/group',function(){
+
+    })->name('chat.group');
+
 });
 
 Route::middleware('auth')->group(function () {
