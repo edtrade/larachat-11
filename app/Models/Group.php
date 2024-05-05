@@ -70,5 +70,13 @@ class Group extends Model
             'last_message'      => $this->last_message,
             'last_message_date' => $this->last_message_date
         ];
-    }    
+    }  
+    
+    public static function updateWithMessage($group_id, $message)
+    {
+        return self::updateOrCreate(
+            ['id' => $group_id],
+            ['last_message_id' => $message->id]
+        );
+    }
 }
