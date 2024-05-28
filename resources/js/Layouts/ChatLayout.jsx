@@ -15,10 +15,10 @@ const ChatLayout = ({children}) => {
   const isUserOnline = (user_id) => onlineUsers[user_id]
 
   const onSearch = (_event) => {
-    const search = _event.target.value.toLowercase()
+    const search = _event.target.value.toLowerCase()
     setLocalConversation(
       localConversations.filter(_conversation => {
-        return _conversation.name.toLowercase().includes(search) 
+        return _conversation.name.toLowerCase().includes(search) 
       })
     )
   }

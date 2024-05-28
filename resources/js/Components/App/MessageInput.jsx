@@ -7,11 +7,53 @@ import {
   PaperAirplaneIcon
 } from '@heroicons/react/24/solid'
 import NewMessageInput from './NewMessageInput'
+import axios from 'axios'
 
 const MessageInput = ({conversation = null}) => {
   const [newMessage, setNewMessage] = useState('')
   const [inputErrorMessage, setInputErrorMessage] = useState('')
   const [messageSending,setMessageSending] = useState(false)
+
+  const onSendClick = (_event)=>{
+    if(newMessage.trim() === ""){
+
+      setInputErrorMessage("Message is required")
+      setTimeout(()=>{
+        setInputErrorMessage("")
+      })
+
+      return
+    }
+    const formData = new FormData()
+    formData.append('message', newMessage)
+
+    if(conversation.is_user){
+      formData.append('receiver_id',conversation.id)
+    }else if(conversation.is_group){
+      formData.append('group_id',conversation.id)
+    }
+
+    setMessageSending(true)
+    axios.post(route('message.store'),formData,{
+      onUploadProgress:(progressEvent)=>{
+        const progress = Math.round(
+          (progressEvent.loaded / progressEvent.total) * 100
+        )
+        console.log(progress)
+      }
+    }).then((response)=>{
+      setNewMessage('')
+      setMessageSending(false)
+    }).catch((error)=>{
+      setMessageSending(false)
+
+      // setInputErrorMessage("Message is required")
+      // setTimeout(()=>{
+      //   setInputErrorMessage("")
+      // })
+
+    })
+  }
 
   return (
     <div className='flex flex-wrap items-start border-t border-slate-700 py-3'>
@@ -21,7 +63,7 @@ const MessageInput = ({conversation = null}) => {
           <input
             type='file'
             multiple
-            className='absolute left-0 top-0 right-0 bottom-0 z-20 opacity-0 cursor-pointer'
+            className='absolute left-0 top-0 right-0 bottom-0 z-0 opacity-0 cursor-pointer'
           />
         </button>
         <button  className='p-1 text-gray-400 hover:text-gray-300 relative'>
@@ -30,7 +72,7 @@ const MessageInput = ({conversation = null}) => {
             type='file'
             multiple
             accept="image/*"
-            className='absolute left-0 top-0 right-0 bottom-0 z-20 opacity-0 cursor-pointer'
+            className='z-0 absolute left-0 top-0 right-0 bottom-0  opacity-0 cursor-pointer'
           />
         </button>
       </div>
@@ -39,8 +81,9 @@ const MessageInput = ({conversation = null}) => {
           <NewMessageInput 
             value={newMessage} 
             onChange={(_event) => setNewMessage(_event.target.value)}
+            onSend={onSendClick}
           />
-          <button className='btn btn-info rounded-l-none'>
+          <button onClick={onSendClick} className='btn btn-info rounded-l-none'>
             {messageSending && (
               <span className='loading loading-spinner loeading-xs'></span>
             )}
